@@ -24,6 +24,7 @@ exports.login = async (req, res) => {
             httpOnly: true,
             secure: true, // true in production (Render HTTPS)
             sameSite: "none",
+            path: "/", // 🔥 add this
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
@@ -44,6 +45,7 @@ exports.logout = (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "none"
+        path: "/", // 🔥 add this
     });
 
     res.status(200).json({
