@@ -1,14 +1,13 @@
 const jwt = require("jsonwebtoken");
 
-const auth = (req, res, next) => {
+module.exports = (req, res, next) => {
+    const header = req.headers.authorization;
 
-    console.log("Cookies:", req.cookies);
-
-    const token = req.cookies.token;
-
-    if (!token) {
-        return res.redirect("/login");
+    if (!header) {
+        return res.status(401).json({ message: "No token" });
     }
+
+    const token = header.split(" ")[1];
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -21,8 +20,6 @@ const auth = (req, res, next) => {
         next();
 
     } catch (err) {
-        return res.redirect("/login");
+        return res.status(401).json({ message: "Invalid token" });
     }
 };
-
-module.exports = auth;
