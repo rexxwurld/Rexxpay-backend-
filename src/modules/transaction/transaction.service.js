@@ -2,7 +2,12 @@ const mongoose = require("mongoose");
 const Wallet = require("../wallet/wallet.model");
 const Transaction = require("./transaction.model");
 
-const transfer = async (senderId, receiverAccountNumber, amount) => {
+const transfer = async (
+    senderId,
+    receiverAccountNumber,
+    amount,
+    description
+) => {
 
     const session = await mongoose.startSession();
 
@@ -11,47 +16,39 @@ const transfer = async (senderId, receiverAccountNumber, amount) => {
 
         amount = Number(amount);
 
-        // 1. Get sender wallet
         const senderWallet = await Wallet.findOne({ userId: senderId }).session(session);
 
-        if (!senderWallet) {
-            throw new Error("Sender wallet not found");
-        }
+        if (!senderWallet) throw new Error("Sender wallet not found");
 
         if (senderWallet.balance < amount) {
             throw new Error("Insufficient balance");
         }
 
-        // 2. Get receiver wallet
-        const receiverWallet = await Wallet.findOne({ accountNumber: receiverAccountNumber }).session(session);
+        const receiverWallet = await Wallet.findOne({
+            accountNumber: receiverAccountNumber
+        }).session(session);
 
-        if (!receiverWallet) {
-            throw new Error("Receiver wallet not found");
-        }
+        if (!receiverWallet) throw new Error("Receiver wallet not found");
 
         if (senderWallet.accountNumber === receiverWallet.accountNumber) {
             throw new Error("Cannot transfer to self");
         }
 
-        // 3. Debit sender
         senderWallet.balance -= amount;
         await senderWallet.save({ session });
 
-        // 4. Credit receiver
         receiverWallet.balance += amount;
         await receiverWallet.save({ session });
 
-        // 5. Create transaction record
         const transaction = await Transaction.create([{
             sender: senderId,
             receiver: receiverWallet.userId,
             amount,
-            description,
+            description, // ✅ now defined
             type: "transfer",
             status: "success"
         }], { session });
 
-        // 6. Commit transaction
         await session.commitTransaction();
         session.endSession();
 
@@ -63,6 +60,9 @@ const transfer = async (senderId, receiverAccountNumber, amount) => {
         throw err;
     }
 };
+
+
+        
 
 
 
