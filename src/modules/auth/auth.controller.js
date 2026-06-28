@@ -22,7 +22,7 @@ exports.login = async (req, res) => {
         // set cookie FIRST
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true, // true in production (Render HTTPS)
+            secure: false, // true in production (Render HTTPS)
             sameSite: "none",
             path: "/", // 🔥 add this
             maxAge: 7 * 24 * 60 * 60 * 1000
