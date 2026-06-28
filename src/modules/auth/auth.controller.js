@@ -1,4 +1,5 @@
 const service = require("./auth.service");
+const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
     try {
@@ -9,29 +10,23 @@ exports.register = async (req, res) => {
     }
 };
 
+
+
 exports.login = async (req, res) => {
     try {
-
         const { email, password } = req.body;
 
-        const result = await service.login(email, password);
+        const { user } = await service.login(email, password);
 
-        // extract token from service result
-        const { user, token } = result;
+        const token = jwt.sign(
+            { id: user._id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" }
+        );
 
-        // set cookie FIRST
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: false, // true in production (Render HTTPS)
-            sameSite: "none",
-            path: "/", // 🔥 add this
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
-
-        // then send response
-        res.status(200).json({
-            message: "Login successful",
-            user
+        res.json({
+            user,
+            token
         });
 
     } catch (err) {
