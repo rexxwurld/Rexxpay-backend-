@@ -1,9 +1,7 @@
 const jwt = require("jsonwebtoken");
-
-
-
-
 const auth = (req, res, next) => {
+
+    console.log("Cookies:", req.cookies);
 
     const token = req.cookies.token;
 
@@ -25,5 +23,3 @@ const auth = (req, res, next) => {
         return res.status(401).json({ message: "Invalid token" });
     }
 };
-
-module.exports = auth;
