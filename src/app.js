@@ -25,7 +25,7 @@ const transactionRoutes = require("./modules/transaction/transaction.routes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/wallet", walletRoutes);
-app.use("/api/transactions", transactionRoutes);
+app.use("/api/transaction", transactionRoutes);
 
 // HOME
 app.get("/", (req, res) => {
