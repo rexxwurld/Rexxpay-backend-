@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+
 const auth = (req, res, next) => {
 
     console.log("Cookies:", req.cookies);
@@ -6,7 +7,7 @@ const auth = (req, res, next) => {
     const token = req.cookies.token;
 
     if (!token) {
-        return res.status(401).json({ message: "No token found" });
+        return res.redirect("/login");
     }
 
     try {
@@ -20,6 +21,8 @@ const auth = (req, res, next) => {
         next();
 
     } catch (err) {
-        return res.status(401).json({ message: "Invalid token" });
+        return res.redirect("/login");
     }
 };
+
+module.exports = auth;
